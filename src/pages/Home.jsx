@@ -1,8 +1,9 @@
 /* eslint-disable react/prop-types */
+
 import Card from "../components/Card";
-import SearchBox from "../components/SearchBox";
-import { QueryParamsToObject } from "../hooks/queryParamsToObject";
 import { useState, useEffect } from "react";
+import useSetQueryParams from "../hooks/useSetQueryParams";
+import useQueryParamsByKey from "../hooks/useQueryParamsByKey";
 // const categories = [
 //   "Design",
 //   "Technology",
@@ -281,16 +282,17 @@ const posts = [
   },
 ];
 
-export default function Home({ searchTerm, handleSearch, params, setParams }) {
+export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
-  useEffect(() => {
-    params.get("p")
-      ? setCurrentPage(Number(params.get("p")))
-      : setCurrentPage(1);
-  }, [params]);
-
+  const searchTerm = useQueryParamsByKey("search");
+  const pageNumber = useQueryParamsByKey("page");
+  const setParams = useSetQueryParams();
   const [itemsPerPage] = useState(15);
   const [filteredPosts, setFilteredPosts] = useState([]);
+
+  useEffect(() => {
+    pageNumber ? setCurrentPage(Number(pageNumber)) : setCurrentPage(1);
+  }, [pageNumber]);
 
   // Update filtered posts when the searchTerm changes
   useEffect(() => {
@@ -311,44 +313,41 @@ export default function Home({ searchTerm, handleSearch, params, setParams }) {
 
   // Change page
   const paginate = (pageNumber) => {
-    const paramsobj = QueryParamsToObject(params);
-    setParams({ ...paramsobj, p: pageNumber });
+    setParams("page", pageNumber);
     setCurrentPage(pageNumber);
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-2">
-      <div className=" md:hidden space-y-8 pt-20">
-        <SearchBox searchTerm={searchTerm} handleSearch={handleSearch} />
-      </div>
+    <div className="mx-auto max-w-7xl px-2 mt-32 md:mt-20 min-h-[calc(100dvh-13rem)] md:min-h-[calc(100dvh-9.5rem)]">
+      {/* ToDo: to show categories if needed */}
       {/* categories */}
-      <div className="mt-20 hidden w-full flex-col justify-between md:flex md:flex-row overflow-y-auto no-scrollbar">
+      {/* <div className="mt-20 hidden w-full flex-col justify-between md:flex md:flex-row overflow-y-auto no-scrollbar">
         <div className="flex w-full items-end border-b border-gray-300">
           <div className="cursor-pointer px-4 py-2 text-base font-semibold leading-normal text-gray-700 first:border-b-2 first:border-black">
             Contents
-          </div>
-          {/* ToDo: to show categories if needed */}
-          {/* {categories.map((filter) => (
+          </div>          
+          {categories.map((filter) => (
             <div
               className="cursor-pointer px-4 py-2 text-base font-semibold leading-normal text-gray-700 first:border-b-2 first:border-black"
               key={filter}
             >
               {filter}
             </div>
-          ))} */}
-        </div>
-      </div>
+          ))}
+         </div>
+      </div> */}
+
       {/* posts */}
       {currentItems.length > 0 ? (
-        <div className="grid gap-6 gap-y-10 py-3 md:grid-cols-3 lg:grid-cols-5">
+        <div className="grid gap-6 gap-y-10 py-3 md:grid-cols-3 lg:grid-cols-5 min-h-[calc(100dvh-12rem)] md:min-h-[calc(100dvh-12.5rem)]">
           {currentItems.map((post, index) => (
-            <Card key={index} post={post} />
+            <Card key={index} post={post} index={index} />
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center h-96">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-12rem)] md:min-h-[calc(100dvh-12.5rem)]">
           <svg
-            className="w-28 "
+            className="w-28 md:w-36"
             enableBackground="new 0 0 32 32"
             id="Layer_1"
             version="1.1"
@@ -390,7 +389,7 @@ export default function Home({ searchTerm, handleSearch, params, setParams }) {
               </g>
             </g>
           </svg>
-          <p className="text-3xl text-gray-700">Not Found</p>
+          <p className="text-3xl text-gray-700">No Results Found</p>
         </div>
       )}
       {/* pagination */}

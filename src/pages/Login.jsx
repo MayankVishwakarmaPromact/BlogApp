@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/reducers/adminReducer";
 import { useNavigate } from "react-router";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 export function Login() {
   const navigateTo = useNavigate();
@@ -30,7 +31,7 @@ export function Login() {
   return (
     <section>
       <div className="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
-        <div className="w-full md:w-2/4 mx-auto border-2 p-4 shadow-lg rounded-md">
+        <div className="w-full md:w-2/5 mx-auto border-2 p-4 shadow-lg rounded-md">
           <div className="mb-2 flex justify-center">
             <Logo width={70} />
           </div>
@@ -38,8 +39,6 @@ export function Login() {
             Admin Login
           </h2>
           <form
-            action="#"
-            method="POST"
             className="mt-8"
             onSubmit={handleSubmit(handleLogin)}
           >
@@ -58,8 +57,8 @@ export function Login() {
                     placeholder="Email"
                     {...register("email", { required: true })}
                   ></input>
-                  {errors.lastName && <p>Last name is required.</p>}
-                </div>
+                  {errors.email && <small className="text-red-600">Email is required.</small>}
+                </div>  
               </div>
               <div>
                 <div className="flex items-center justify-between">
@@ -77,6 +76,7 @@ export function Login() {
                     placeholder="Password"
                     {...register("password", { required: true })}
                   ></input>
+                  {errors.password && <small className="text-red-600">Password is required.</small>}
                 </div>
               </div>
               <div>
@@ -86,6 +86,15 @@ export function Login() {
                 >
                   Login <ArrowRight className="ml-2" size={16} />
                 </button>
+              </div>
+              <div className="divider">OR</div>
+              <div className="text-center">
+                <Link
+                  className="text-sm font-semibold text-gray-800 hover:text-gray-900 hover:underline"
+                  to={"/"}
+                >
+                  Back To Home
+                </Link>
               </div>
             </div>
           </form>

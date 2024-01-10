@@ -6,34 +6,39 @@ import { Link, useNavigate } from "react-router-dom";
 import Logo from "./Logo.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/reducers/adminReducer.js";
+import SetQueryParams from "../hooks/useSetQueryParams";
+import GetQueryParamsByKey from "../hooks/useQueryParamsByKey";
+import ModalView from "./ModalView.jsx";
+import AddPostForm from "./AddPostForm.jsx";
+
 const title = "Hola Amigo";
 
-export default function Header({ searchTerm, handleSearch }) {
+const menuItems = [
+  {
+    name: "Home",
+    href: "/",
+  },
+  {
+    name: "About",
+    href: "#",
+  },
+];
+
+export default function Header() {
+  const setParams = SetQueryParams();
+  const params = GetQueryParamsByKey("search");
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(params);
+  // Search functionality
+  const handleSearch = (event) => {
+    setParams("search", event.target.value);
+    setSearchTerm(event.target.value);
+  };
   const isAdminLoggedIn = useSelector(
     (state) => state.admin.admin.isAdminLogin
   );
-  const menuItems = [
-    {
-      name: "Home",
-      href: "/",
-      isvisibleToAdmin: true,
-    },
-    {
-      name: "About",
-      href: "#",
-      isvisibleToAdmin: true,
-    },
-    {
-      name: "Contact",
-      href: "#",
-      isvisibleToAdmin: true,
-    },
-    {
-      name: "Add New",
-      href: "#",
-      isvisibleToAdmin: isAdminLoggedIn,
-    },
-  ];
+
   const dispatch = useDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigateTo = useNavigate();
@@ -58,14 +63,23 @@ export default function Header({ searchTerm, handleSearch }) {
               <li key={item.name}>
                 <Link
                   to={item.href}
-                  className={`text-sm font-semibold text-gray-800 hover:text-gray-900 hover:underline ${
-                    item.isvisibleToAdmin ? `block` : `hidden`
-                  }`}
+                  className="text-sm font-semibold text-gray-800 hover:text-gray-900 hover:underline"
+                  onClick={item.handleClick}
                 >
                   {item.name}
                 </Link>
               </li>
             ))}
+            {isAdminLoggedIn && <li>
+              <button
+                className='text-sm font-semibold text-gray-800 hover:text-gray-900 hover:underline'
+                onClick={() => {
+                  setIsModalOpen(!isModalOpen);
+                }}
+              >
+                Add New
+              </button>
+            </li>}
           </ul>
         </div>
 
@@ -100,38 +114,26 @@ export default function Header({ searchTerm, handleSearch }) {
         <div className="lg:hidden">
           <Menu onClick={toggleMenu} className="h-6 w-6 cursor-pointer" />
         </div>
-        {isMenuOpen && <MenuBox toggleMenu={toggleMenu} />}
+        {isMenuOpen && <MenuBox toggleMenu={toggleMenu} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}/>}
       </div>
+
+      {/* searchbar for mobile view */}
+      <div className="mx-auto max-w-7xl block md:hidden md:w-3/4 lg:w-2/4 px-4 py-2">
+        <SearchBox searchTerm={searchTerm} handleSearch={handleSearch} />
+      </div>
+
+      <ModalView isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
+        <AddPostForm />
+      </ModalView>
     </header>
   );
 }
 
-function MenuBox({ toggleMenu }) {
+function MenuBox({ toggleMenu , isModalOpen, setIsModalOpen}) {
   const isAdminLoggedIn = useSelector(
     (state) => state.admin.admin.isAdminLogin
   );
-  const menuItems = [
-    {
-      name: "Home",
-      href: "/",
-      isvisibleToAdmin: true,
-    },
-    {
-      name: "About",
-      href: "#",
-      isvisibleToAdmin: true,
-    },
-    {
-      name: "Contact",
-      href: "#",
-      isvisibleToAdmin: true,
-    },
-    {
-      name: "Add New",
-      href: "#",
-      isvisibleToAdmin: isAdminLoggedIn,
-    },
-  ];
+
   const dispatch = useDispatch();
   const navigateTo = useNavigate();
   return (
@@ -162,15 +164,26 @@ function MenuBox({ toggleMenu }) {
                 <a
                   key={item.name}
                   href={item.href}
-                  className={`-m-3 items-center rounded-md p-3 text-sm font-semibold hover:bg-gray-50 ${
-                    item.isvisibleToAdmin ? `flex` : `hidden`
-                  }`}
+                  className="-m-3 items-center rounded-md p-3 text-sm font-semibold hover:bg-gray-50"
                 >
                   <span className="ml-3 text-base font-medium text-gray-900">
                     {item.name}
                   </span>
                 </a>
               ))}
+              <button
+                className={`-m-3 items-center rounded-md p-3 text-sm font-semibold hover:bg-gray-50 ${
+                  isAdminLoggedIn ? `flex` : `hidden`
+                }`}
+                onClick={() => {
+                  setIsModalOpen(!isModalOpen);
+                  toggleMenu();
+                }}
+              >
+                <span className="ml-3 text-base font-medium text-gray-900">
+                  Add New
+                </span>
+              </button>
             </nav>
           </div>
           {!isAdminLoggedIn ? (
