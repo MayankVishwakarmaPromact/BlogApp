@@ -10,6 +10,7 @@ import SetQueryParams from "../hooks/useSetQueryParams";
 import GetQueryParamsByKey from "../hooks/useQueryParamsByKey";
 import ModalView from "./ModalView.jsx";
 import AddPostForm from "./AddPostForm.jsx";
+import { AuthGuard } from "../functions/AuthGuard.js";
 
 const title = "Hola Amigo";
 
@@ -70,16 +71,18 @@ export default function Header() {
                 </Link>
               </li>
             ))}
-            {isAdminLoggedIn && <li>
-              <button
-                className='text-sm font-semibold text-gray-800 hover:text-gray-900 hover:underline'
-                onClick={() => {
-                  setIsModalOpen(!isModalOpen);
-                }}
-              >
-                Add New
-              </button>
-            </li>}
+            <AuthGuard>
+              <li>
+                <button
+                  className="text-sm font-semibold text-gray-800 hover:text-gray-900 hover:underline"
+                  onClick={() => {
+                    setIsModalOpen(!isModalOpen);
+                  }}
+                >
+                  Add New
+                </button>
+              </li>
+            </AuthGuard>
           </ul>
         </div>
 
@@ -114,7 +117,13 @@ export default function Header() {
         <div className="lg:hidden">
           <Menu onClick={toggleMenu} className="h-6 w-6 cursor-pointer" />
         </div>
-        {isMenuOpen && <MenuBox toggleMenu={toggleMenu} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}/>}
+        {isMenuOpen && (
+          <MenuBox
+            toggleMenu={toggleMenu}
+            isModalOpen={isModalOpen}
+            setIsModalOpen={setIsModalOpen}
+          />
+        )}
       </div>
 
       {/* searchbar for mobile view */}
@@ -129,7 +138,7 @@ export default function Header() {
   );
 }
 
-function MenuBox({ toggleMenu , isModalOpen, setIsModalOpen}) {
+function MenuBox({ toggleMenu, isModalOpen, setIsModalOpen }) {
   const isAdminLoggedIn = useSelector(
     (state) => state.admin.admin.isAdminLogin
   );
@@ -171,19 +180,19 @@ function MenuBox({ toggleMenu , isModalOpen, setIsModalOpen}) {
                   </span>
                 </a>
               ))}
-              <button
-                className={`-m-3 items-center rounded-md p-3 text-sm font-semibold hover:bg-gray-50 ${
-                  isAdminLoggedIn ? `flex` : `hidden`
-                }`}
-                onClick={() => {
-                  setIsModalOpen(!isModalOpen);
-                  toggleMenu();
-                }}
-              >
-                <span className="ml-3 text-base font-medium text-gray-900">
-                  Add New
-                </span>
-              </button>
+              <AuthGuard>
+                <a
+                  className="-m-3 items-center rounded-md p-3 text-sm font-semibold hover:bg-gray-50"
+                  onClick={() => {
+                    setIsModalOpen(!isModalOpen);
+                    toggleMenu();
+                  }}
+                >
+                  <span className="ml-3 text-base font-medium text-gray-900">
+                    Add New
+                  </span>
+                </a>
+              </AuthGuard>
             </nav>
           </div>
           {!isAdminLoggedIn ? (

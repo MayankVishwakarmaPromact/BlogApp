@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useEffect } from "react";
 
-export default function ModalView({ children, isModalOpen, setIsModalOpen}) {
+export default function ModalView({ children, isModalOpen, setIsModalOpen }) {
   useEffect(() => {
     isModalOpen && document.getElementById("my_modal_3").showModal();
   }, [isModalOpen]);
@@ -13,7 +13,10 @@ export default function ModalView({ children, isModalOpen, setIsModalOpen}) {
         <div className="modal-box">
           <form method="dialog">
             {/* if there is a button in form, it will close the modal */}
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={()=>setIsModalOpen(!isModalOpen)}>
+            <button
+              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              onClick={() => setIsModalOpen(!isModalOpen)}
+            >
               ✕
             </button>
           </form>
