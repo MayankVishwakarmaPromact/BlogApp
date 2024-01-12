@@ -82,14 +82,16 @@ export default function Home() {
 
       {/* posts */}
       {currentItems.length > 0 ? (
-        <div className="grid gap-6 gap-y-10 py-3 md:grid-cols-3 lg:grid-cols-5 min-h-[calc(100dvh-12rem)] md:min-h-[calc(100dvh-12.5rem)]">
-          {/* {currentItems.map((post, index) => (
-            <Card key={index} post={post} index={index} />
-          ))} */}
-          <ForEach
-            of={currentItems}
-            render={(post, index) => <Card post={post} index={index} />}
-          />
+        <div className="min-h-[calc(100dvh-12rem)] md:min-h-[calc(100dvh-12.5rem)]">
+          <div className="grid gap-6 gap-y-10 py-3 md:grid-cols-3 lg:grid-cols-5 ">
+            {/* {currentItems.map((post, index) => (
+              <Card key={index} post={post} index={index} />
+            ))} */}
+            <ForEach
+              of={currentItems}
+              render={(post, index) => <Card post={post} index={index} />}
+            />
+          </div>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-12rem)] md:min-h-[calc(100dvh-12.5rem)]">

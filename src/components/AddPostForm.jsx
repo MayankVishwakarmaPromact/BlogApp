@@ -1,9 +1,10 @@
+/* eslint-disable react/prop-types */
 import { ArrowRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { createPost } from "../httpRequests/httpRequests.js";
 
-export default function AddPostForm() {
+export default function AddPostForm({setIsModalOpen}) {
   const mutation = useMutation({
     mutationFn: (data) => {
       createPost(data);
@@ -18,8 +19,8 @@ export default function AddPostForm() {
   } = useForm({mode:'all'});
 
   const handleLogin = (data) => {
-    console.log(data);
-    reset();
+    // console.log(data);
+    reset();setIsModalOpen(false)
     mutation.mutate(data);
   };
   return (

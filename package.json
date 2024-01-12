@@ -25,7 +25,9 @@
     "react-redux": "^9.0.4",
     "react-router": "^6.21.1",
     "react-router-dom": "^6.21.1",
-    "redux-persist": "^6.0.0"
+    "redux-persist": "^6.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^5.17.7",

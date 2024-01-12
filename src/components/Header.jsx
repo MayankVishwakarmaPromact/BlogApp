@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchBox from "./SearchBox.jsx";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "./Logo.jsx";
@@ -28,28 +28,33 @@ const menuItems = [
 export default function Header() {
   const setParams = SetQueryParams();
   const params = GetQueryParamsByKey("search");
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const isAdminLoggedIn = useSelector(
+    (state) => state.admin.admin.isAdminLogin
+  );
+  const dispatch = useDispatch();
+  const navigateTo = useNavigate();
+  
   const [searchTerm, setSearchTerm] = useState(params);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    setSearchTerm(params);
+  }, [params]);
+
   // Search functionality
   const handleSearch = (event) => {
     setParams("search", event.target.value);
     setSearchTerm(event.target.value);
   };
-  const isAdminLoggedIn = useSelector(
-    (state) => state.admin.admin.isAdminLogin
-  );
 
-  const dispatch = useDispatch();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigateTo = useNavigate();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   return (
-    <header className="fixed top-0 w-full border-b bg-white py-2">
+    <header className="fixed top-0 w-full border-b bg-white py-2 z-10">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2">
         <div className="inline-flex items-center space-x-2">
           <span>
@@ -132,7 +137,7 @@ export default function Header() {
       </div>
 
       <ModalView isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
-        <AddPostForm />
+        <AddPostForm setIsModalOpen={setIsModalOpen} />
       </ModalView>
     </header>
   );
