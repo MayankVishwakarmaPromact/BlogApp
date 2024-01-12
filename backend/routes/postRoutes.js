@@ -38,7 +38,7 @@ postRoutes.get("/posts", getAllPosts);
 
 /**
  * @swagger
- * /api/post/{id}:
+ * /api/posts/{id}:
  *   get:
  *     summary: Get post by ID
  *     tags: [Posts]
@@ -61,7 +61,7 @@ postRoutes.get("/posts", getAllPosts);
  *           application/json:
  *             example: { error: 'message' }
  */
-postRoutes.get("/post/:id", getPostById);
+postRoutes.get("/posts/:id", getPostById);
 
 /**
  * @swagger
@@ -130,7 +130,7 @@ postRoutes.put("/posts/:id", editPost);
 
 /**
  * @swagger
- * /api/post/{id}:
+ * /api/posts/{id}:
  *   delete:
  *     summary: Delete post by ID
  *     tags: [Posts]
@@ -153,6 +153,6 @@ postRoutes.put("/posts/:id", editPost);
  *           application/json:
  *             example: { error: 'message' }
  */
-postRoutes.delete("/post/:id", deletePost);
+postRoutes.delete("/posts/:id", deletePost);
 
 export default postRoutes;

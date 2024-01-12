@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createPost } from "../httpRequests/httpRequests.js";
 
 export default function AddPostForm({setIsModalOpen}) {
-  const mutation = useMutation({
+  const createPostMutation = useMutation({
     mutationFn: (data) => {
       createPost(data);
     },
@@ -21,7 +21,7 @@ export default function AddPostForm({setIsModalOpen}) {
   const handleLogin = (data) => {
     // console.log(data);
     reset();setIsModalOpen(false)
-    mutation.mutate(data);
+    createPostMutation.mutate(data);
   };
   return (
     <>

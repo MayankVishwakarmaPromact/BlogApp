@@ -46,6 +46,7 @@ export default function Home() {
         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.description.toLowerCase().includes(searchTerm.toLowerCase()) 
     );
+    console.log(filteredData)
     setFilteredPosts(filteredData);
   }, [posts, searchTerm]);
 
@@ -82,8 +83,8 @@ export default function Home() {
 
       {/* posts */}
       {currentItems.length > 0 ? (
-        <div className="min-h-[calc(100dvh-12rem)] md:min-h-[calc(100dvh-12.5rem)]">
-          <div className="grid gap-6 gap-y-10 py-3 md:grid-cols-3 lg:grid-cols-5 ">
+        <div className="min-h-[calc(100dvh-13rem)] md:min-h-[calc(100dvh-12.5rem)] ">
+          <div className="grid gap-6 py-3 md:grid-cols-3 lg:grid-cols-5 ">
             {/* {currentItems.map((post, index) => (
               <Card key={index} post={post} index={index} />
             ))} */}
@@ -142,7 +143,7 @@ export default function Home() {
         </div>
       )}
       {/* pagination */}
-      <div className="w-full border-t border-gray-300">
+      <div className="rounded-md p-4 w-full border-t border-gray-300 bg-white">
         <div className="mt-2 flex items-center justify-between">
           <div className="hidden md:block">
             <p>
