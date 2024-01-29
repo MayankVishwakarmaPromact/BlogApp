@@ -69,6 +69,23 @@ postRoutes.get("/posts/:id", getPostById);
  *   post:
  *     summary: Create a new post
  *     tags: [Posts]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               poster:
+ *                 type: string
+ *             example:
+ *               title: "Post Title"
+ *               description: "Post Description"
+ *               poster: "Post Poster"
  *     responses:
  *       '200':
  *         description: Successful response
