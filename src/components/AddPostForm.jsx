@@ -1,34 +1,73 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
+import { useQuery } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
-import { createPost } from "../httpRequests/httpRequests.js";
+import { getPostById } from "../httpRequests/httpRequests";
 
-export default function AddPostForm({setIsModalOpen}) {
-  const createPostMutation = useMutation({
-    mutationFn: (data) => {
-      createPost(data);
-    },
-  });
-
+export default function AddPostForm({
+  selectedIdToEdit,
+  isModalOpen,
+  setIsModalOpen,
+  createNewPost,
+  updatePostData,
+}) {
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
-  } = useForm({mode:'all'});
+  } = useForm({
+    defaultValues: {
+      title: "",
+      description: "",
+      poster: "",
+    },
+    mode: "all",
+  });
 
-  const handleLogin = (data) => {
-    // console.log(data);
-    reset();setIsModalOpen(false)
-    createPostMutation.mutate(data);
+  const getPostData = useQuery({
+    queryKey: ["posts", selectedIdToEdit],
+    queryFn: async () => await getPostById(selectedIdToEdit),
+    enabled: false,
+  });
+  useEffect(() => {
+    if (isModalOpen) {
+      selectedIdToEdit != "" && getPostData.refetch();
+    }
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    if (getPostData.isFetched && selectedIdToEdit != "") {
+      setValue("title", getPostData.data["title"]);
+      setValue("description", getPostData.data["description"]);
+      setValue("poster", getPostData.data["poster"]);
+    } else {
+      reset();
+    }
+  }, [getPostData.data, selectedIdToEdit]);
+
+  const createPost = (data) => {
+    createNewPost(data);
+    reset();
+    setIsModalOpen(false);
+  };
+  const editPost = (data) => {
+    updatePostData(selectedIdToEdit, data);
+    reset();
+    setIsModalOpen(false);
   };
   return (
     <>
       <h2 className="text-center text-2xl font-bold leading-tight text-black">
-        Create New Post
+        {selectedIdToEdit ? "Edit Post" : "Create New Post"}
       </h2>
-      <form className="mt-8" onSubmit={handleSubmit(handleLogin)}>
+      <form
+        className="mt-8"
+        onSubmit={handleSubmit(selectedIdToEdit ? editPost : createPost)}
+      >
         <div className="space-y-5">
           <div>
             <label
@@ -94,7 +133,8 @@ export default function AddPostForm({setIsModalOpen}) {
               type="submit"
               className="inline-flex w-full items-center justify-center rounded-md bg-black px-3.5 py-2.5 font-semibold leading-7 text-white hover:bg-black/80"
             >
-              Create Post <ArrowRight className="ml-2" size={16} />
+              {selectedIdToEdit ? "Update Post" : "Create Post"}{" "}
+              <ArrowRight className="ml-2" size={16} />
             </button>
           </div>
         </div>

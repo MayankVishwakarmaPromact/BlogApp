@@ -1,24 +1,20 @@
 import { useNavigate } from "react-router";
 import { MoreVertical } from "lucide-react";
 import { AuthGuard } from "../functions/AuthGuard";
-import { useMutation } from "@tanstack/react-query";
-import { deletePost } from "../httpRequests/httpRequests";
 import ModalView from "./ModalView";
 import { useState } from "react";
 
 /* eslint-disable react/prop-types */
-export default function Card({ post, index }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedIdToDelete, selecteIdToDelete] = useState(false);
+export default function Card({
+  post,
+  index,
+  deleteSelectedPost,
+  setIsModalOpen,
+  selectIdToEdit
+}) {
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [selectedIdToDelete, selectIdToDelete] = useState("");
   const { _id, title, poster, description } = post;
-  const deletePostMutation = useMutation({
-    mutationFn: (id) => {
-      deletePost(id);
-    },
-    onSettled: (id) => {
-      console.log(id)
-    }
-  });
   const navigateTo = useNavigate();
   return (
     <div className="border rounded-md bg-white dropdown dropdown-end shadow-md">
@@ -36,14 +32,17 @@ export default function Card({ post, index }) {
         className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box absolute top-12"
       >
         <li>
-          <a className="hover:bg-black hover:text-white">Edit</a>
+          <a className="hover:bg-black hover:text-white" onClick={() => {
+            selectIdToEdit(_id);setIsModalOpen(true)}}>
+            Edit
+          </a>
         </li>
         <li>
           <a
             className="hover:bg-black hover:text-white"
             onClick={() => {
-              selecteIdToDelete(_id);
-              setIsModalOpen(true);
+              selectIdToDelete(_id);
+              setIsConfirmModalOpen(true);
             }}
           >
             Delete
@@ -69,8 +68,7 @@ export default function Card({ post, index }) {
         <p className="mt-4 w-full text-sm leading-normal text-gray-600 line-clamp-2">
           {description}
         </p>
-        <p className="mt-4 w-full text-sm leading-normal text-gray-600 line-clamp-2">
-        </p>
+        <p className="mt-4 w-full text-sm leading-normal text-gray-600 line-clamp-2"></p>
 
         <button
           type="button"
@@ -80,13 +78,16 @@ export default function Card({ post, index }) {
           View More
         </button>
       </div>
-      <ModalView isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
+      <ModalView
+        isModalOpen={isConfirmModalOpen}
+        setIsModalOpen={setIsConfirmModalOpen}
+      >
         <ConfirmDeleteModal
           onClick={() => {
-            deletePostMutation.mutate(selectedIdToDelete);
-            setIsModalOpen(false);
+            deleteSelectedPost(selectedIdToDelete);
+            setIsConfirmModalOpen(false);
           }}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => setIsConfirmModalOpen(false)}
         />
       </ModalView>
     </div>

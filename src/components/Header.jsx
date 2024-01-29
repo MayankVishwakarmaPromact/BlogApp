@@ -8,9 +8,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/reducers/adminReducer.js";
 import SetQueryParams from "../hooks/useSetQueryParams";
 import GetQueryParamsByKey from "../hooks/useQueryParamsByKey";
-import ModalView from "./ModalView.jsx";
-import AddPostForm from "./AddPostForm.jsx";
-import { AuthGuard } from "../functions/AuthGuard.js";
 
 const title = "Hola Amigo";
 
@@ -36,7 +33,6 @@ export default function Header() {
   
   const [searchTerm, setSearchTerm] = useState(params);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     setSearchTerm(params);
@@ -60,7 +56,7 @@ export default function Header() {
           <span>
             <Logo width={30} />
           </span>
-          <span className="font-bold">{title}</span>
+          <span className="font-bold text-2xl">{title}</span>
         </div>
 
         <div className="hidden lg:block">
@@ -76,22 +72,11 @@ export default function Header() {
                 </Link>
               </li>
             ))}
-            <AuthGuard>
-              <li>
-                <button
-                  className="text-sm font-semibold text-gray-800 hover:text-gray-900 hover:underline"
-                  onClick={() => {
-                    setIsModalOpen(!isModalOpen);
-                  }}
-                >
-                  Add New
-                </button>
-              </li>
-            </AuthGuard>
+            
           </ul>
         </div>
 
-        <div className="hidden md:block md:w-3/4 lg:w-2/4">
+        <div className="hidden md:block md:w-3/5 lg:w-2/4">
           <SearchBox searchTerm={searchTerm} handleSearch={handleSearch} />
         </div>
 
@@ -125,8 +110,6 @@ export default function Header() {
         {isMenuOpen && (
           <MenuBox
             toggleMenu={toggleMenu}
-            isModalOpen={isModalOpen}
-            setIsModalOpen={setIsModalOpen}
           />
         )}
       </div>
@@ -135,15 +118,11 @@ export default function Header() {
       <div className="mx-auto max-w-7xl block md:hidden md:w-3/4 lg:w-2/4 px-4 py-2">
         <SearchBox searchTerm={searchTerm} handleSearch={handleSearch} />
       </div>
-
-      <ModalView isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
-        <AddPostForm setIsModalOpen={setIsModalOpen} />
-      </ModalView>
     </header>
   );
 }
 
-function MenuBox({ toggleMenu, isModalOpen, setIsModalOpen }) {
+function MenuBox({ toggleMenu }) {
   const isAdminLoggedIn = useSelector(
     (state) => state.admin.admin.isAdminLogin
   );
@@ -185,19 +164,6 @@ function MenuBox({ toggleMenu, isModalOpen, setIsModalOpen }) {
                   </span>
                 </a>
               ))}
-              <AuthGuard>
-                <a
-                  className="-m-3 items-center rounded-md p-3 text-sm font-semibold hover:bg-gray-50"
-                  onClick={() => {
-                    setIsModalOpen(!isModalOpen);
-                    toggleMenu();
-                  }}
-                >
-                  <span className="ml-3 text-base font-medium text-gray-900">
-                    Add New
-                  </span>
-                </a>
-              </AuthGuard>
             </nav>
           </div>
           {!isAdminLoggedIn ? (

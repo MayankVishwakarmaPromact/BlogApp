@@ -5,8 +5,17 @@ import { useState, useEffect } from "react";
 import useSetQueryParams from "../hooks/useSetQueryParams";
 import useQueryParamsByKey from "../hooks/useQueryParamsByKey";
 import { ForEach } from "../functions/ForEach";
-import { useQuery } from "@tanstack/react-query";
-import {getAllPosts} from '../httpRequests/httpRequests.js'
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { AuthGuard } from "../functions/AuthGuard.js";
+import { Plus } from "lucide-react";
+import ModalView from "../components/ModalView.jsx";
+import AddPostForm from "../components/AddPostForm.jsx";
+import {
+  createPost,
+  getAllPosts,
+  deletePost,
+  editPost,
+} from "../httpRequests/httpRequests.js";
 // const categories = [
 //   "Design",
 //   "Technology",
@@ -20,6 +29,7 @@ import {getAllPosts} from '../httpRequests/httpRequests.js'
 // ];
 
 export default function Home() {
+  let isMounted = true;
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const searchTerm = useQueryParamsByKey("search");
@@ -27,28 +37,61 @@ export default function Home() {
   const setParams = useSetQueryParams();
   const [itemsPerPage] = useState(15);
   const [filteredPosts, setFilteredPosts] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedIdToEdit, selectIdToEdit] = useState("");
+  const [updatedData, setUpdatedData] = useState();
 
-  const queryResult = useQuery({queryKey:['posts'],queryFn: getAllPosts})
-  
+  const getAllPostsdata = useQuery({
+    queryKey: ["posts"],
+    queryFn: getAllPosts,
+    enabled: false,
+  });
+  const createPostMutation = useMutation({
+    mutationFn: async (data) => {
+      await createPost(data);
+      await getAllPostsdata.refetch();
+    },
+  });
+  const editPostMutation = useMutation({
+    mutationFn: async (id, data) => {
+      data ? await editPost(id, data) : await editPost(id, updatedData);
+      await getAllPostsdata.refetch();
+    },
+  });
+  const deletePostMutation = useMutation({
+    mutationFn: async (id) => {
+      await deletePost(id);
+      await getAllPostsdata.refetch();
+    },
+  });
   useEffect(() => {
-      queryResult.isFetched && setPosts(queryResult.data)    
-  }, [queryResult]);
+    if (isMounted) {
+      getAllPostsdata.refetch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => (isMounted = false);
+  }, [getAllPostsdata.refetch]);
 
   useEffect(() => {
-    pageNumber ? setCurrentPage(Number(pageNumber)) : setCurrentPage(1);
-  }, [pageNumber]);
+    getAllPostsdata.isFetched && setPosts(getAllPostsdata.data);
+  }, [getAllPostsdata]);
+  useEffect(() => {
+    !pageNumber && setParams("page", 1);
+  }, [pageNumber, searchTerm, setParams]);
+
+  useEffect(() => {
+    searchTerm == "" ? setCurrentPage(Number(pageNumber)) : setCurrentPage(1);
+  }, [pageNumber, searchTerm]);
 
   // Update filtered posts when the searchTerm changes
   useEffect(() => {
-    setCurrentPage(1);
     const filteredData = posts.filter(
       (item) =>
         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchTerm.toLowerCase()) 
+        item.description.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    console.log(filteredData)
     setFilteredPosts(filteredData);
-  }, [posts, searchTerm]);
+  }, [pageNumber, posts, searchTerm]);
 
   // Pagination based on filtered posts
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -61,8 +104,20 @@ export default function Home() {
     setCurrentPage(pageNumber);
   };
 
+  const createNewPost = (data) => {
+    createPostMutation.mutate(data);
+  };
+  const updatePostData = (id, data) => {
+    selectIdToEdit("");
+    setUpdatedData(data);
+    editPostMutation.mutate(id, data);
+  };
+  const deleteSelectedPost = (id) => {
+    deletePostMutation.mutate(id);
+  };
+
   return (
-    <div className="mx-auto max-w-7xl px-2 mt-32 md:mt-20 min-h-[calc(100dvh-13rem)] md:min-h-[calc(100dvh-9.5rem)]">
+    <div className="mt-24 md:mt-[4.5rem] mx-auto max-w-7xl px-2">
       {/* ToDo: to show categories if needed */}
       {/* categories */}
       {/* <div className="mt-20 hidden w-full flex-col justify-between md:flex md:flex-row overflow-y-auto no-scrollbar">
@@ -81,23 +136,52 @@ export default function Home() {
          </div>
       </div> */}
 
+      <div className="pt-2 md:pt-2 w-full flex justify-between">
+        <div className="flex w-full p-2 md:p-5 rounded-md items-center bg-white top-6 md:top-1  relative">
+          <div className="px-4 py-2 text-xl font-bold text-gray-700  first:border-black">
+            Posts
+          </div>
+          <AuthGuard>
+            <div className=" absolute right-1 cursor-pointer px-4 py-2 text-sm md:text-base font-semibold leading-normal text-gray-700 first:border-b-2 first:border-black">
+              <button
+                className=" flex gap-1 bg-transparent hover:bg-gray-900 text-gray-800 font-semibold hover:text-white py-2 px-4 border border-gray-500 hover:border-transparent rounded"
+                onClick={() => {
+                  selectIdToEdit("");
+                  setIsModalOpen(!isModalOpen);
+                }}
+              >
+                Add New <Plus />
+              </button>
+            </div>
+          </AuthGuard>
+        </div>
+      </div>
+
       {/* posts */}
       {currentItems.length > 0 ? (
-        <div className="min-h-[calc(100dvh-13rem)] md:min-h-[calc(100dvh-12.5rem)] ">
-          <div className="grid gap-6 py-3 md:grid-cols-3 lg:grid-cols-5 ">
+        <div className="min-h-[calc(100dvh-13rem)] md:min-h-[calc(100dvh-22rem)] ">
+          <div className="grid gap-6 pt-8 md:pt-3 py-2 md:grid-cols-3 lg:grid-cols-5 ">
             {/* {currentItems.map((post, index) => (
               <Card key={index} post={post} index={index} />
             ))} */}
             <ForEach
               of={currentItems}
-              render={(post, index) => <Card post={post} index={index} />}
+              render={(post, index) => (
+                <Card
+                  post={post}
+                  index={index}
+                  deleteSelectedPost={deleteSelectedPost}
+                  setIsModalOpen={setIsModalOpen}
+                  selectIdToEdit={selectIdToEdit}
+                />
+              )}
             />
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-12rem)] md:min-h-[calc(100dvh-12.5rem)]">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-20rem)]">
           <svg
-            className="w-28 md:w-36"
+            className="w-16 md:w-36"
             enableBackground="new 0 0 32 32"
             id="Layer_1"
             version="1.1"
@@ -139,9 +223,10 @@ export default function Home() {
               </g>
             </g>
           </svg>
-          <p className="text-3xl text-gray-700">No Results Found</p>
+          <p className="md:text-3xl text-gray-700">No Results Found</p>
         </div>
       )}
+
       {/* pagination */}
       <div className="rounded-md p-4 w-full border-t border-gray-300 bg-white">
         <div className="mt-2 flex items-center justify-between">
@@ -182,6 +267,16 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <ModalView isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
+        <AddPostForm
+          selectedIdToEdit={selectedIdToEdit}
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+          createNewPost={createNewPost}
+          updatePostData={updatePostData}
+        />
+      </ModalView>
     </div>
   );
 }
