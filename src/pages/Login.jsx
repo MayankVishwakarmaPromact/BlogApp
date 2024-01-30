@@ -30,13 +30,13 @@ export function Login() {
   };
   return (
     <section>
-      <div className="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
-        <div className="w-full md:w-2/5 mx-auto border-2 p-4 shadow-lg rounded-md">
+      <div className="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24 bg-white min-h-[100dvh]">
+        <div className="w-full md:w-2/6 mx-auto border-2 p-4 shadow-lg rounded-md">
           <div className="mb-2 flex justify-center">
             <Logo width={70} />
           </div>
           <h2 className="text-center text-2xl font-bold leading-tight text-black">
-            Admin Login
+            Hola Amigo
           </h2>
           <form
             className="mt-8"

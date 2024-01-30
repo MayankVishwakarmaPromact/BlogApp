@@ -4,8 +4,15 @@ import { dbConnection } from "./db.js";
 import postRoutes from "./routes/postRoutes.js";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
-import swaggerJsdoc from "swagger-jsdoc";
 import userRoutes from "./routes/userRoutes.js";
+
+
+import { readFile } from 'fs/promises';
+const swaggerDocument = JSON.parse(
+  await readFile(
+    new URL('./apiDoc.json', import.meta.url)
+  )
+);
 
 const PORT = 3000;
 
@@ -16,24 +23,8 @@ const server = createServer(app);
 const connect = dbConnection();
 connect();
 
-const swaggerOptions = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Hola Amigo",
-      version: "1.0.0",
-      description: "Api Documentation for Hola Amigo",
-    },
-  },
-  apis: ["./routes/postRoutes.js", "./routes/userRoutes.js"],
-};
-
-const specs = swaggerJsdoc(swaggerOptions);
-
 // Serve Swagger UI at /api-docs endpoint
-console.log('swagger options : '+ JSON.stringify(swaggerOptions));
-console.log('swagger specs : '+ JSON.stringify(specs));
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Midilewares
 app.use(express.json());
