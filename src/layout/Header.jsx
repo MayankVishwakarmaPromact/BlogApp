@@ -1,13 +1,13 @@
 /* eslint-disable react/prop-types */
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import SearchBox from "./SearchBox.jsx";
+import SearchBox from "../components/SearchBox.jsx";
 import { Link, useNavigate } from "react-router-dom";
-import Logo from "./Logo.jsx";
+import Logo from "../components/Logo.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/reducers/adminReducer.js";
-import SetQueryParams from "../hooks/useSetQueryParams";
-import GetQueryParamsByKey from "../hooks/useQueryParamsByKey";
+import SetQueryParams from "../hooks/useSetQueryParams.js";
+import GetQueryParamsByKey from "../hooks/useQueryParamsByKey.js";
 
 const title = "Hola Amigo";
 
@@ -30,7 +30,7 @@ export default function Header() {
   );
   const dispatch = useDispatch();
   const navigateTo = useNavigate();
-  
+
   const [searchTerm, setSearchTerm] = useState(params);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -43,7 +43,6 @@ export default function Header() {
     setParams("search", event.target.value);
     setSearchTerm(event.target.value);
   };
-
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -72,7 +71,6 @@ export default function Header() {
                 </Link>
               </li>
             ))}
-            
           </ul>
         </div>
 
@@ -107,11 +105,7 @@ export default function Header() {
         <div className="lg:hidden">
           <Menu onClick={toggleMenu} className="h-6 w-6 cursor-pointer" />
         </div>
-        {isMenuOpen && (
-          <MenuBox
-            toggleMenu={toggleMenu}
-          />
-        )}
+        {isMenuOpen && <MenuBox toggleMenu={toggleMenu} />}
       </div>
 
       {/* searchbar for mobile view */}

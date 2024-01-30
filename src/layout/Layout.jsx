@@ -4,8 +4,6 @@ import { Outlet } from "react-router-dom";
 // import AuthGuard from "../Router/AuthGuard";
 
 export default function Layout() {
-  
-
   return (
     <div>
       {/* <AuthGuard> */}
